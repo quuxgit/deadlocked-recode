@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*-recode'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libasound2-dev libudev-dev
+        
+    - name: Build release
+      run: cargo build --release --bin deadlocked
+      
+    - name: Build reduced models
+      run: cargo build --release --bin deadlocked --features reduced-models
+      
+    - name: Rename binaries
+      run: |
+        cp target/release/deadlocked deadlocked
+        cargo clean
+        cargo build --release --bin deadlocked --features reduced-models
+        cp target/release/deadlocked deadlocked-reduced-models
+        
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          deadlocked
+          deadlocked-reduced-models
+          setup.sh
+        body: |
+          ## deadlocked recode ${{ github.ref_name }}
+          
+          ### Downloads
+          - `deadlocked` - full version with all player models
+          - `deadlocked-reduced-models` - lightweight version
+          - `setup.sh` - setup script (run once)
+          
+          ### Installation
+          ```bash
+          chmod +x deadlocked setup.sh
+          ./setup.sh
+          # Restart your machine
+          ./deadlocked
+          ```
+          
+          See [README.md](https://github.com/quuxgit/deadlocked-recode) for full documentation.
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

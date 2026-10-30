@@ -25,17 +25,20 @@ jobs:
         sudo apt-get install -y libasound2-dev libudev-dev
         
     - name: Build release
-      run: cargo build --release --bin deadlocked
-      
-    - name: Build reduced models
-      run: cargo build --release --bin deadlocked --features reduced-models
+      run: cargo build --release --workspace
       
     - name: Rename binaries
       run: |
         cp target/release/deadlocked deadlocked
-        cargo clean
-        cargo build --release --bin deadlocked --features reduced-models
+        chmod +x deadlocked
+        
+    - name: Build reduced models
+      run: cargo build --release --bin deadlocked --features reduced-models
+      
+    - name: Rename reduced binary
+      run: |
         cp target/release/deadlocked deadlocked-reduced-models
+        chmod +x deadlocked-reduced-models
         
     - name: Create Release
       uses: softprops/action-gh-release@v1

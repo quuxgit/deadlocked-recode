@@ -1,0 +1,53 @@
+use egui::Ui;
+
+use crate::{
+    config::application::write_app_config,
+    ui::{
+        app::AppState,
+        gui::helpers::{checkbox, open_url},
+    },
+    update::UpdateStatus,
+};
+
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
+impl AppState {
+    pub fn application_settings(&mut self, ui: &mut Ui) {
+        ui.vertical_centered(|ui| {
+            ui.heading("deadlocked recode");
+            ui.add_space(4.0);
+            ui.label("Authors: avitrano, quuxgit");
+            ui.label(format!("Version: v{VERSION}"));
+
+            ui.separator();
+
+            match &self.update_status {
+                UpdateStatus::UpToDate => {
+                    ui.colored_label(crate::ui::color::Colors::GREEN, "Up to date");
+                }
+                UpdateStatus::Available { version, url } => {
+                    ui.colored_label(
+                        crate::ui::color::Colors::YELLOW,
+                        format!("Update available: {version}"),
+                    );
+                    if ui.link("Download").clicked() {
+                        open_url(url);
+                    }
+                }
+                UpdateStatus::Error(err) => {
+                    ui.colored_label(
+                        crate::ui::color::Colors::RED,
+                        format!("Update check failed: {err}"),
+                    );
+                }
+            }
+
+            ui.separator();
+
+            if checkbox(ui, "Show Overlay", &mut self.overlay_enabled) {
+                self.app_config.overlay_enabled = self.overlay_enabled;
+                write_app_config(&self.app_config);
+            }
+        });
+    }
+}

@@ -1,0 +1,83 @@
+use std::{collections::HashMap, fs::read_to_string};
+
+use glam::{Vec2, Vec3};
+use serde::{Deserialize, Serialize};
+use shared::Weapon;
+use uuid::Uuid;
+
+use crate::{config::BASE_PATH, constants::GRENADE_FILE_NAME};
+
+pub type GrenadeList = HashMap<String, Vec<Grenade>>;
+
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct Grenade {
+    pub id: Uuid,
+    pub name: String,
+    #[serde(default)]
+    pub description: String,
+    pub position: Vec3,
+    pub view_angles: Vec2,
+    pub weapon: Weapon,
+    #[serde(default)]
+    pub modifiers: GrenadeModifiers,
+}
+
+impl Grenade {
+    pub fn new() -> Self {
+        Self {
+            id: Uuid::new_v4(),
+            ..Default::default()
+        }
+    }
+
+    //shared molotov and incendiary lineups
+    pub fn matches(&self, held: &Weapon) -> bool {
+        self.weapon == *held
+            || matches!(
+                (&self.weapon, held),
+                (Weapon::Molotov, Weapon::Incendiary) | (Weapon::Incendiary, Weapon::Molotov)
+            )
+    }
+}
+
+#[derive(Default, Serialize, Deserialize, Clone)]
+pub struct GrenadeModifiers {
+    pub jump: bool,
+    pub duck: bool,
+    pub run: bool,
+}
+
+pub fn read_grenades() -> GrenadeList {
+    let path = BASE_PATH.join(GRENADE_FILE_NAME);
+    if !path.exists() {
+        utils::info!("no grenade list found");
+        return GrenadeList::default();
+    }
+
+    let grenade_list_file = match read_to_string(path) {
+        Ok(file) => file,
+        Err(err) => {
+            utils::warn!("failed to read grenade list: {err}");
+            return GrenadeList::default();
+        }
+    };
+
+    match serde_json::from_str(&grenade_list_file) {
+        Ok(grenades) => grenades,
+        Err(err) => {
+            utils::warn!("grenade list file invalid: {err}");
+            GrenadeList::default()
+        }
+    }
+}
+
+pub fn write_grenades(grenades: &GrenadeList) {
+    let Ok(out) = serde_json::to_string(grenades) else {
+        utils::warn!("failed to serialize grenade list");
+        return;
+    };
+    let path = BASE_PATH.join(GRENADE_FILE_NAME);
+    if let Err(err) = std::fs::write(path, out) {
+        utils::warn!("failed to write grenade list: {err}");
+    }
+}

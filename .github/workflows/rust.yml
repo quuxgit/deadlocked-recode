@@ -22,15 +22,12 @@ jobs:
       run: cargo check --workspace --all-targets
     - name: Build release binaries
       run: cargo build --release
-    - name: Create Release
-      if: github.event_name == 'push'
-      uses: softprops/action-gh-release@v1
+    - name: Upload release artifact
+      uses: actions/upload-artifact@v4
       with:
-        tag_name: v${{ github.run_number }}
-        files: |
+        name: deadlocked
+        path: |
           target/release/deadlocked
           target/release/deadlocked-reduced-models
           setup.sh
-        fail_on_unmatched_files: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if-no-files-found: error

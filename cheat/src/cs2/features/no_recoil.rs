@@ -17,9 +17,12 @@ impl CS2 {
             return;
         };
 
-        let current_penalty: f32 = self.process.read(weapon + self.offsets.weapon.accuracy_penalty);
+        let current_penalty: f32 = self
+            .process
+            .read(weapon + self.offsets.weapon.accuracy_penalty);
         if current_penalty != 0.0 {
-            self.process.write(weapon + self.offsets.weapon.accuracy_penalty, 0.0f32);
+            self.process
+                .write(weapon + self.offsets.weapon.accuracy_penalty, 0.0f32);
         }
     }
 }

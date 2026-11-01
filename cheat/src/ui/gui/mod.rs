@@ -77,28 +77,44 @@ impl AppState {
 
     pub(crate) fn gui(&mut self, ui: &mut Ui) {
         ui.ctx().set_pixels_per_point(self.display_scale);
-        
+
         let mut tab_changed = false;
         let old_tab = self.current_tab;
 
         egui::Panel::left("sidebar")
             .resizable(false)
             .show(ui, |ui| {
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Aimbot, "Aimbot").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Player, "Player").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Hud, "Hud").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Hitmarker, "Hitmarker").changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Aimbot, "Aimbot")
+                    .changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Player, "Player")
+                    .changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Hud, "Hud")
+                    .changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Hitmarker, "Hitmarker")
+                    .changed();
                 // tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Grenades, "Grenades").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Unsafe, "Unsafe").changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Unsafe, "Unsafe")
+                    .changed();
                 // tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Radar, "Radar").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Config, "Config").changed();
-                tab_changed |= ui.selectable_value(&mut self.current_tab, Tab::Application, "Application").changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Config, "Config")
+                    .changed();
+                tab_changed |= ui
+                    .selectable_value(&mut self.current_tab, Tab::Application, "Application")
+                    .changed();
 
                 ui.with_layout(egui::Layout::bottom_up(Align::Min), |ui| {
                     ui.add_space(4.0);
-                    ui.label(egui::RichText::new(concat!("v", env!("CARGO_PKG_VERSION")))
-                        .size(12.0)
-                        .color(Colors::SUBTEXT));
+                    ui.label(
+                        egui::RichText::new(concat!("v", env!("CARGO_PKG_VERSION")))
+                            .size(12.0)
+                            .color(Colors::SUBTEXT),
+                    );
                 });
             });
 
@@ -114,12 +130,13 @@ impl AppState {
                         .find(|c| c.1 == self.config.accent_color)
                         .map(|c| c.2)
                         .unwrap_or("cheat/assets/sfblue.jpg");
-                    
+
                     if let Ok(image_data) = std::fs::read(wallpaper) {
                         if let Ok(image) = image::load_from_memory(&image_data) {
                             let size = [image.width() as _, image.height() as _];
                             let pixels = image.to_rgba8();
-                            let color_image = egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
+                            let color_image =
+                                egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
                             self.background_texture = Some(ui.ctx().load_texture(
                                 "background",
                                 color_image,
@@ -132,36 +149,37 @@ impl AppState {
                 if let Some(texture) = &self.background_texture {
                     let available_size = ui.available_size();
                     let texture_size = texture.size_vec2();
-                    let scale = (available_size.x / texture_size.x)
-                        .max(available_size.y / texture_size.y);
+                    let scale =
+                        (available_size.x / texture_size.x).max(available_size.y / texture_size.y);
                     let scaled_size = texture_size * scale;
                     let offset = (available_size - scaled_size) * 0.5;
 
-                    let rect = egui::Rect::from_min_size(
-                        ui.min_rect().min + offset,
-                        scaled_size,
-                    );
+                    let rect = egui::Rect::from_min_size(ui.min_rect().min + offset, scaled_size);
 
                     ui.painter().image(
                         texture.id(),
                         rect,
                         egui::Rect::from_min_max(egui::pos2(0.0, 0.0), egui::pos2(1.0, 1.0)),
-                        egui::Color32::from_rgba_unmultiplied(255, 255, 255, self.background_opacity),
+                        egui::Color32::from_rgba_unmultiplied(
+                            255,
+                            255,
+                            255,
+                            self.background_opacity,
+                        ),
                     );
                 }
             }
 
             let slide_progress = self.tab_slide.update(ui.ctx(), true);
-            
+
             let available_height = ui.available_height();
             let offset = (1.0 - slide_progress) * available_height * 0.1;
-            
+
             ui.add_space(offset);
-            
+
             let alpha = (slide_progress * 255.0) as u8;
-            ui.style_mut().visuals.override_text_color = Some(
-                egui::Color32::from_rgba_unmultiplied(255, 255, 255, alpha)
-            );
+            ui.style_mut().visuals.override_text_color =
+                Some(egui::Color32::from_rgba_unmultiplied(255, 255, 255, alpha));
 
             match self.current_tab {
                 Tab::Aimbot => self.aimbot_settings(ui),

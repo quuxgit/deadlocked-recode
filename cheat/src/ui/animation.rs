@@ -1,5 +1,5 @@
-use std::time::Instant;
 use egui::Context;
+use std::time::Instant;
 
 #[derive(Clone, Copy)]
 pub struct AnimationState {
@@ -25,7 +25,8 @@ impl AnimationState {
 
     pub fn update(&mut self, ctx: &Context) -> bool {
         let now = Instant::now();
-        let dt = self.last_update
+        let dt = self
+            .last_update
             .map(|last| now.duration_since(last).as_secs_f32())
             .unwrap_or(0.016);
         self.last_update = Some(now);

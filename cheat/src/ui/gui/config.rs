@@ -88,12 +88,13 @@ impl AppState {
                         {
                             self.config.accent_color = color;
                             self.background_texture = None;
-                            
+
                             if let Ok(image_data) = std::fs::read(wallpaper) {
                                 if let Ok(image) = image::load_from_memory(&image_data) {
                                     let size = [image.width() as _, image.height() as _];
                                     let pixels = image.to_rgba8();
-                                    let color_image = egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
+                                    let color_image =
+                                        egui::ColorImage::from_rgba_unmultiplied(size, &pixels);
                                     self.background_texture = Some(ui.ctx().load_texture(
                                         "background",
                                         color_image,
@@ -101,7 +102,7 @@ impl AppState {
                                     ));
                                 }
                             }
-                            
+
                             ui.ctx()
                                 .global_style_mut(|style| style.visuals.selection.bg_fill = color);
                             self.send_config_game();
@@ -112,7 +113,10 @@ impl AppState {
             ui.add_space(8.0);
             ui.label("Background Opacity:");
             ui.add_space(4.0);
-            if ui.add(egui::Slider::new(&mut self.background_opacity, 0..=255)).changed() {
+            if ui
+                .add(egui::Slider::new(&mut self.background_opacity, 0..=255))
+                .changed()
+            {
                 self.app_config.background_opacity = self.background_opacity;
                 write_app_config(&self.app_config);
             }

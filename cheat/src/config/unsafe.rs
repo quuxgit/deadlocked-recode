@@ -1,6 +1,6 @@
+use crate::cs2::key_codes::KeyCode;
 use egui::Color32;
 use serde::{Deserialize, Serialize};
-use crate::cs2::key_codes::KeyCode;
 
 #[derive(Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum BhopMode {

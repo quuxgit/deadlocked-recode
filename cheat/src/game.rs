@@ -29,7 +29,9 @@ impl GameManager {
             Ok(mouse) => mouse,
             Err(err) => {
                 utils_log::error!("error creating uinput device: {err}");
-                utils_log::error!("uinput kernel module is not loaded, or user is not in input group.");
+                utils_log::error!(
+                    "uinput kernel module is not loaded, or user is not in input group."
+                );
                 std::process::exit(1);
             }
         };

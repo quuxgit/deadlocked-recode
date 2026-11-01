@@ -173,9 +173,11 @@ impl AppState {
                 }
 
                 ui.label(if self.process_freeze.is_frozen() {
-                    egui::RichText::new("Status: Frozen").color(egui::Color32::from_rgb(255, 100, 100))
+                    egui::RichText::new("Status: Frozen")
+                        .color(egui::Color32::from_rgb(255, 100, 100))
                 } else {
-                    egui::RichText::new("Status: Running").color(egui::Color32::from_rgb(100, 255, 100))
+                    egui::RichText::new("Status: Running")
+                        .color(egui::Color32::from_rgb(100, 255, 100))
                 });
             } else {
                 ui.label("Waiting for CS2...");

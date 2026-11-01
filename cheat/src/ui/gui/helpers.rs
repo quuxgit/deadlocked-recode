@@ -64,14 +64,14 @@ pub fn color_picker(ui: &mut Ui, label: &str, color: &mut Color32) -> bool {
         .horizontal(|ui| {
             let (response, painter) =
                 ui.allocate_painter(ui.spacing().interact_size, Sense::hover());
-            
+
             let corner_radius = ui.style().visuals.widgets.inactive.corner_radius;
             painter.rect_filled(response.rect, corner_radius, *color);
-            
+
             if response.hovered() {
                 ui.ctx().request_repaint();
             }
-            
+
             let mut res = ui.add(DragValue::new(&mut r).prefix("r: "));
             res = res.union(ui.add(DragValue::new(&mut g).prefix("g: ")));
             res = res.union(ui.add(DragValue::new(&mut b).prefix("b: ")));

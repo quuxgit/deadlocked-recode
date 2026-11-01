@@ -228,7 +228,9 @@ impl Process {
                         mask.push(0xFF);
                     }
                     Err(_) => {
-                        utils_log::warn!("unrecognized pattern token \"{token}\" in pattern {pattern}");
+                        utils_log::warn!(
+                            "unrecognized pattern token \"{token}\" in pattern {pattern}"
+                        );
                     }
                 }
             } else {

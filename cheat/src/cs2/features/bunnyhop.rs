@@ -2,7 +2,10 @@ use std::{
     fs::File,
     io::Write,
     os::fd::AsRawFd,
-    sync::{atomic::{AtomicBool, Ordering}, Mutex},
+    sync::{
+        Mutex,
+        atomic::{AtomicBool, Ordering},
+    },
     time::{SystemTime, UNIX_EPOCH},
 };
 
@@ -171,10 +174,30 @@ impl Keyboard {
         };
 
         let events = [
-            InputEvent { time: press_time,   event_type: EV_KEY, code: KEY_SPACE,  value: 1 },
-            InputEvent { time: press_time,   event_type: EV_SYN, code: SYN_REPORT, value: 0 },
-            InputEvent { time: release_time, event_type: EV_KEY, code: KEY_SPACE,  value: 0 },
-            InputEvent { time: release_time, event_type: EV_SYN, code: SYN_REPORT, value: 0 },
+            InputEvent {
+                time: press_time,
+                event_type: EV_KEY,
+                code: KEY_SPACE,
+                value: 1,
+            },
+            InputEvent {
+                time: press_time,
+                event_type: EV_SYN,
+                code: SYN_REPORT,
+                value: 0,
+            },
+            InputEvent {
+                time: release_time,
+                event_type: EV_KEY,
+                code: KEY_SPACE,
+                value: 0,
+            },
+            InputEvent {
+                time: release_time,
+                event_type: EV_SYN,
+                code: SYN_REPORT,
+                value: 0,
+            },
         ];
 
         for event in &events {

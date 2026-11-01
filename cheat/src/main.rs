@@ -1,10 +1,9 @@
 use std::sync::Arc;
 
 use shared::Data;
-use utils::{
-    Channel, Mutex,
-    log::{Level, LoggerOptions},
-};
+use utils_channel::Channel;
+use utils_log::{Level, LoggerOptions};
+use utils_sync::Mutex;
 use winit::platform::x11::EventLoopBuilderExtX11;
 
 use crate::{config::BASE_PATH, os::mouse::check_uinput, parser::clear_cache, ui::app::App};
@@ -28,7 +27,7 @@ compile_error!("only linux is supported.");
 
 fn main() {
     let debug = std::env::args().any(|arg| arg == "--debug");
-    utils::log::init_ext(
+    utils_log::init_ext(
         LoggerOptions::default()
             .level(if debug { Level::Debug } else { Level::Info })
             .file(BASE_PATH.join("deadlocked.log"))
@@ -37,7 +36,7 @@ fn main() {
     .expect("failed to initialize logger");
 
     if std::env::args().any(|arg| arg == "--clear-cache") {
-        utils::info!("clearing bvh cache");
+        utils_log::info!("clearing bvh cache");
         clear_cache();
     }
 
@@ -62,7 +61,7 @@ fn main() {
     let event_loop = match winit::event_loop::EventLoop::builder().with_x11().build() {
         Ok(event_loop) => event_loop,
         Err(err) => {
-            utils::error!("failed to create event loop: {err}");
+            utils_log::error!("failed to create event loop: {err}");
             return;
         }
     };

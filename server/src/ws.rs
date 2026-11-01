@@ -15,7 +15,7 @@ use uuid::Uuid;
 use crate::state::ServerState;
 
 pub async fn websocket_server(state: ServerState) {
-    utils::info!("starting websocket server on port 6347");
+    utils_log::info!("starting websocket server on port 6347");
 
     let app = Router::new()
         .route("/client", any(client_handler))
@@ -25,13 +25,13 @@ pub async fn websocket_server(state: ServerState) {
     let listener = match TcpListener::bind("0.0.0.0:6347").await {
         Ok(listener) => listener,
         Err(err) => {
-            utils::error!("failed to bind port '0.0.0.0:6347': {}", err);
+            utils_log::error!("failed to bind port '0.0.0.0:6347': {}", err);
             return;
         }
     };
 
     if let Err(err) = axum::serve(listener, app).await {
-        utils::error!("failed to serve application: {err}");
+        utils_log::error!("failed to serve application: {err}");
     }
 }
 
@@ -48,7 +48,7 @@ async fn client(state: ServerState, mut ws: WebSocket) {
         return;
     };
 
-    utils::info!("client connected to session {uuid}");
+    utils_log::info!("client connected to session {uuid}");
 
     loop {
         interval.tick().await;
@@ -62,7 +62,7 @@ async fn client(state: ServerState, mut ws: WebSocket) {
             match serde_json::to_string(&game_state.data) {
                 Ok(message) => message,
                 Err(err) => {
-                    utils::warn!("failed to encode data as json: {err}");
+                    utils_log::warn!("failed to encode data as json: {err}");
                     continue;
                 }
             }
@@ -73,7 +73,7 @@ async fn client(state: ServerState, mut ws: WebSocket) {
         }
     }
 
-    utils::info!("client disconnected from session {uuid}");
+    utils_log::info!("client disconnected from session {uuid}");
 }
 
 async fn stats_handler(State(state): State<ServerState>) -> Json<serde_json::Value> {
@@ -91,7 +91,7 @@ async fn get_uuid(ws: &mut WebSocket) -> Option<Uuid> {
     let uuid_msg = match uuid_msg {
         Ok(uuid_msg) => uuid_msg,
         Err(err) => {
-            utils::error!("failed to receive message: {err}");
+            utils_log::error!("failed to receive message: {err}");
             return None;
         }
     };
@@ -99,7 +99,7 @@ async fn get_uuid(ws: &mut WebSocket) -> Option<Uuid> {
     let uuid = match uuid_msg.to_text() {
         Ok(uuid) => uuid,
         Err(err) => {
-            utils::error!("failed to parse message: {err}");
+            utils_log::error!("failed to parse message: {err}");
             return None;
         }
     };
@@ -107,7 +107,7 @@ async fn get_uuid(ws: &mut WebSocket) -> Option<Uuid> {
     let uuid = match Uuid::from_str(uuid) {
         Ok(uuid) => uuid,
         Err(err) => {
-            utils::error!("invalid uuid: {err}");
+            utils_log::error!("invalid uuid: {err}");
             return None;
         }
     };

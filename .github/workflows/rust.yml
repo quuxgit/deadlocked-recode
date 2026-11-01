@@ -1,0 +1,36 @@
+name: Rust
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: install alsa for rodio
+      run: sudo apt-get update && sudo apt-get install --yes libasound2-dev pkg-config
+    - name: Check formatting
+      run: cargo fmt --all -- --check
+    - name: Cargo check
+      run: cargo check --workspace --all-targets
+    - name: Build release binaries
+      run: cargo build --release
+    - name: Create Release
+      if: github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: v${{ github.run_number }}
+        files: |
+          target/release/deadlocked
+          target/release/deadlocked-reduced-models
+          setup.sh
+        fail_on_unmatched_files: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

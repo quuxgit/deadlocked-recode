@@ -52,7 +52,7 @@ impl AppState {
         if self.model_renderer.is_none() {
             match model::ModelRenderer::new(glow.clone()) {
                 Ok(renderer) => self.model_renderer = Some(Arc::new(renderer)),
-                Err(error) => utils::error!("failed to initialize model renderer: {error}"),
+                Err(error) => utils_log::error!("failed to initialize model renderer: {error}"),
             }
         }
 

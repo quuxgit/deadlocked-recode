@@ -7,10 +7,9 @@ use std::{
 };
 
 use shared::{Data, HEARTBEAT, MAX_FRAME_SIZE, PROTO_VERSION};
-use utils::{
-    Channel, Mutex,
-    io::{Endian, EndianReaderWriter},
-};
+use utils_channel::Channel;
+use utils_io::{Endian, EndianReaderWriter};
+use utils_sync::Mutex;
 use uuid::Uuid;
 
 use crate::{
@@ -90,7 +89,7 @@ impl Radar {
         let message = match postcard::to_stdvec(self.data.lock().deref()) {
             Ok(message) => message,
             Err(err) => {
-                utils::error!("failed to serialize radar data: {err}");
+                utils_log::error!("failed to serialize radar data: {err}");
                 self.state = None;
                 self.send_message(RadarStatus::FailedToConnect);
                 return false;
@@ -98,20 +97,20 @@ impl Radar {
         };
 
         if message.len() > MAX_FRAME_SIZE as usize {
-            utils::error!("serialized radar data exceeds maximum frame size");
+            utils_log::error!("serialized radar data exceeds maximum frame size");
             self.state = None;
             self.send_message(RadarStatus::FailedToConnect);
             return false;
         }
 
         if let Err(err) = state.stream.write_u32(message.len() as u32) {
-            utils::warn!("failed to send radar frame length: {err}");
+            utils_log::warn!("failed to send radar frame length: {err}");
             self.state = None;
             self.send_message(RadarStatus::FailedToConnect);
             return false;
         }
         if let Err(err) = state.stream.write_all(&message) {
-            utils::warn!("failed to send radar data frame: {err}");
+            utils_log::warn!("failed to send radar data frame: {err}");
             self.state = None;
             self.send_message(RadarStatus::FailedToConnect);
             return false;
@@ -120,7 +119,7 @@ impl Radar {
         const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(5);
         if state.last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
             if let Err(err) = state.stream.write_u32(HEARTBEAT) {
-                utils::warn!("failed to send radar heartbeat: {err}");
+                utils_log::warn!("failed to send radar heartbeat: {err}");
                 self.state = None;
                 self.send_message(RadarStatus::FailedToConnect);
                 return false;
@@ -142,7 +141,7 @@ impl Radar {
         let mut addresses = match (self.config.url.as_ref(), 6346).to_socket_addrs() {
             Ok(addresses) => addresses,
             Err(err) => {
-                utils::debug!("failed to resolve {}: {err}", self.config.url);
+                utils_log::debug!("failed to resolve {}: {err}", self.config.url);
                 return None;
             }
         };
@@ -151,17 +150,17 @@ impl Radar {
             let stream = match TcpStream::connect_timeout(&address, TIMEOUT) {
                 Ok(stream) => stream,
                 Err(err) => {
-                    utils::debug!("failed to connect to {address}: {err}");
+                    utils_log::debug!("failed to connect to {address}: {err}");
                     return None;
                 }
             };
 
             if let Err(err) = stream.set_read_timeout(Some(TIMEOUT)) {
-                utils::warn!("failed to set read timeout for radar connection: {err}");
+                utils_log::warn!("failed to set read timeout for radar connection: {err}");
                 return None;
             }
             if let Err(err) = stream.set_write_timeout(Some(TIMEOUT)) {
-                utils::warn!("failed to set write timeout for radar connection: {err}");
+                utils_log::warn!("failed to set write timeout for radar connection: {err}");
                 return None;
             }
 

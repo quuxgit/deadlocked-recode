@@ -45,10 +45,10 @@ pub fn read_app_config() -> ApplicationConfig {
 #[allow(dead_code)]
 pub fn write_app_config(config: &ApplicationConfig) {
     let Ok(out) = toml::to_string(config) else {
-        utils::warn!("failed to serialize application config");
+        utils_log::warn!("failed to serialize application config");
         return;
     };
     if let Err(err) = std::fs::write(APP_CONFIG_PATH.as_path(), out) {
-        utils::warn!("failed to write application config: {err}");
+        utils_log::warn!("failed to write application config: {err}");
     }
 }

@@ -74,12 +74,12 @@ impl ModuleScope {
 
     pub fn get(&self, class: &str, field: &str) -> Option<usize> {
         let Some(c) = self.classes.get(class) else {
-            utils::warn!("could not find class {class}");
+            utils_log::warn!("could not find class {class}");
             return None;
         };
         let f = c.get(field);
         if f.is_none() {
-            utils::warn!("could not find field {field} in class {class}");
+            utils_log::warn!("could not find field {field} in class {class}");
         }
         f
     }

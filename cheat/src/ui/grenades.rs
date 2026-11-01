@@ -50,14 +50,14 @@ pub struct GrenadeModifiers {
 pub fn read_grenades() -> GrenadeList {
     let path = BASE_PATH.join(GRENADE_FILE_NAME);
     if !path.exists() {
-        utils::info!("no grenade list found");
+        utils_log::info!("no grenade list found");
         return GrenadeList::default();
     }
 
     let grenade_list_file = match read_to_string(path) {
         Ok(file) => file,
         Err(err) => {
-            utils::warn!("failed to read grenade list: {err}");
+            utils_log::warn!("failed to read grenade list: {err}");
             return GrenadeList::default();
         }
     };
@@ -65,7 +65,7 @@ pub fn read_grenades() -> GrenadeList {
     match serde_json::from_str(&grenade_list_file) {
         Ok(grenades) => grenades,
         Err(err) => {
-            utils::warn!("grenade list file invalid: {err}");
+            utils_log::warn!("grenade list file invalid: {err}");
             GrenadeList::default()
         }
     }
@@ -73,11 +73,11 @@ pub fn read_grenades() -> GrenadeList {
 
 pub fn write_grenades(grenades: &GrenadeList) {
     let Ok(out) = serde_json::to_string(grenades) else {
-        utils::warn!("failed to serialize grenade list");
+        utils_log::warn!("failed to serialize grenade list");
         return;
     };
     let path = BASE_PATH.join(GRENADE_FILE_NAME);
     if let Err(err) = std::fs::write(path, out) {
-        utils::warn!("failed to write grenade list: {err}");
+        utils_log::warn!("failed to write grenade list: {err}");
     }
 }

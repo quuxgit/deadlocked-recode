@@ -7,7 +7,8 @@ use std::{
 };
 
 use shared::{Data, SoundType, Weapon};
-use utils::{Channel, Mutex};
+use utils_channel::Channel;
+use utils_sync::Mutex;
 use winit::{
     application::ApplicationHandler,
     event::{ElementState, StartCause, WindowEvent},
@@ -346,7 +347,7 @@ impl App {
 
         self.state.config.font.set(gui.egui());
         self.state.display_scale = gui.window().scale_factor() as f32;
-        utils::info!("detected display scale: {}", self.state.display_scale);
+        utils_log::info!("detected display scale: {}", self.state.display_scale);
         self.gui = Some(gui);
 
         self.create_overlay(event_loop);
@@ -363,7 +364,7 @@ impl App {
         self.state.config.font.set(overlay.egui());
         self.state.overlay_egui = Some(overlay.egui().clone());
         self.overlay = Some(overlay);
-        utils::info!("overlay window created");
+        utils_log::info!("overlay window created");
     }
 
     /// destroy the overlay window, frees the GL resourcess in context.
@@ -387,7 +388,7 @@ impl App {
 
         self.state.overlay_egui = None;
         self.overlay = None;
-        utils::info!("overlay window destroyed");
+        utils_log::info!("overlay window destroyed");
     }
 
     fn sync_overlay(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
@@ -566,7 +567,7 @@ impl ApplicationHandler for App {
         };
 
         if let Err(error) = overlay.make_current() {
-            utils::warn!("could not make overlay context current for model cleanup: {error}");
+            utils_log::warn!("could not make overlay context current for model cleanup: {error}");
             return;
         }
         renderer.destroy();

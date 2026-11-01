@@ -33,7 +33,7 @@ impl Process {
             .read(true)
             .open(format!("/proc/{pid}/mem"))
             .unwrap_or_else(|e| {
-                utils::error!("failed to open /proc/{pid}/mem: {e}");
+                utils_log::error!("failed to open /proc/{pid}/mem: {e}");
                 OpenOptions::new().read(true).open("/dev/null").unwrap()
             });
         let mut ret = Self {
@@ -201,10 +201,10 @@ impl Process {
             let Ok(address) = usize::from_str_radix(address, 16) else {
                 continue;
             };
-            utils::debug!("found module {module_name} at {address:X}");
+            utils_log::debug!("found module {module_name} at {address:X}");
             return Some(address);
         }
-        utils::warn!("module {module_name} not found");
+        utils_log::warn!("module {module_name} not found");
         None
     }
 
@@ -228,11 +228,11 @@ impl Process {
                         mask.push(0xFF);
                     }
                     Err(_) => {
-                        utils::warn!("unrecognized pattern token \"{token}\" in pattern {pattern}");
+                        utils_log::warn!("unrecognized pattern token \"{token}\" in pattern {pattern}");
                     }
                 }
             } else {
-                utils::warn!("unrecognized pattern token \"{token}\" in pattern {pattern}");
+                utils_log::warn!("unrecognized pattern token \"{token}\" in pattern {pattern}");
             }
         }
 
@@ -253,7 +253,7 @@ impl Process {
             return Some(address);
         }
 
-        utils::info!("pattern {pattern} not found, might be outdated");
+        utils_log::info!("pattern {pattern} not found, might be outdated");
         None
     }
 
@@ -310,7 +310,7 @@ impl Process {
             }
             symbol_table += add;
         }
-        utils::warn!("export {} could not be found", export_name);
+        utils_log::warn!("export {} could not be found", export_name);
         None
     }
 
@@ -339,7 +339,7 @@ impl Process {
 
             address += register_size * 2;
         }
-        utils::warn!("did not find tag {} in dynamic section", tag);
+        utils_log::warn!("did not find tag {} in dynamic section", tag);
         None
     }
 
@@ -354,7 +354,7 @@ impl Process {
                 return Some(entry);
             }
         }
-        utils::warn!("did not find dynamic section in program header table");
+        utils_log::warn!("did not find dynamic section in program header table");
         None
     }
 
@@ -384,7 +384,7 @@ impl Process {
 
             index = self.read::<u16>(slot + 0xA) as usize;
         }
-        utils::warn!("did not find convar {convar_name}");
+        utils_log::warn!("did not find convar {convar_name}");
         None
     }
 

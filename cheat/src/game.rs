@@ -5,7 +5,8 @@ use std::{
 };
 
 use shared::Data;
-use utils::{Channel, Mutex};
+use utils_channel::Channel;
+use utils_sync::Mutex;
 
 use crate::{
     config::Config,
@@ -27,8 +28,8 @@ impl GameManager {
         let mouse = match Mouse::open() {
             Ok(mouse) => mouse,
             Err(err) => {
-                utils::error!("error creating uinput device: {err}");
-                utils::error!("uinput kernel module is not loaded, or user is not in input group.");
+                utils_log::error!("error creating uinput device: {err}");
+                utils_log::error!("uinput kernel module is not loaded, or user is not in input group.");
                 std::process::exit(1);
             }
         };

@@ -10,7 +10,7 @@ mod ws;
 
 #[tokio::main]
 async fn main() {
-    utils::log::init();
+    utils_log::init();
 
     let state = ServerState::default();
     let state_tcp = state.clone();
@@ -37,7 +37,7 @@ fn clean(state: &mut state::State) {
     state.sessions.retain(|uuid, game| {
         let valid = game.last_update.elapsed() < MAX_AGE;
         if !valid {
-            utils::info!("removed session {uuid} after timeout");
+            utils_log::info!("removed session {uuid} after timeout");
         }
         valid
     });

@@ -59,7 +59,7 @@ impl AppState {
             if ui.button("Reset").clicked() {
                 self.config = Config::default();
                 self.send_config_game();
-                utils::info!("loaded default config");
+                utils_log::info!("loaded default config");
             }
 
             if ui.button("Config Folder").clicked() {

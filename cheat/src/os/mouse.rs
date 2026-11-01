@@ -216,14 +216,14 @@ impl Drop for Mouse {
 pub fn check_uinput() -> bool {
     let path = Path::new("/dev/uinput");
     if !path.exists() {
-        utils::error!("the uinput kernel module is not loaded.");
-        utils::error!("this module needs to be loaded for mouse input to work.");
-        utils::error!("please carefully read the readme before using.");
+        utils_log::error!("the uinput kernel module is not loaded.");
+        utils_log::error!("this module needs to be loaded for mouse input to work.");
+        utils_log::error!("please carefully read the readme before using.");
         return false;
     }
     if let Err(err) = File::options().write(true).open(path) {
-        utils::error!("failed to open /dev/uinput for writing: {err}");
-        utils::error!("check the uinput permissions and whether you ran the setup script.");
+        utils_log::error!("failed to open /dev/uinput for writing: {err}");
+        utils_log::error!("check the uinput permissions and whether you ran the setup script.");
         return false;
     }
     true

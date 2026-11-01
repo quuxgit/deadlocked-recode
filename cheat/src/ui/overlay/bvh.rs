@@ -7,7 +7,7 @@ use egui_glow::{
     glow::{self, HasContext as _},
 };
 use glam::Vec3;
-use utils::Mutex;
+use utils_sync::Mutex;
 
 use shared::Data;
 
@@ -239,7 +239,7 @@ impl AppState {
         self.last_bvh_load = Some(std::time::Instant::now());
         self.bvh = load_map(&self.bvh_map, &self.bvh_build_date);
         if self.bvh.is_none() {
-            utils::warn!(
+            utils_log::warn!(
                 "failed to load BVH cache for visualizer on {}",
                 self.bvh_map
             );
@@ -272,7 +272,7 @@ impl AppState {
                 match BvhRenderer::new(glow.clone(), map, bvh, origin, range) {
                     Ok(new_renderer) => *renderer = Some(new_renderer),
                     Err(error) => {
-                        utils::error!("failed to create BVH visualizer: {error}");
+                        utils_log::error!("failed to create BVH visualizer: {error}");
                         *renderer = None;
                         return;
                     }

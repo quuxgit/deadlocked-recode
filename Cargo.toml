@@ -13,7 +13,11 @@ strip = true
 [workspace.dependencies]
 shared.path = "shared"
 
-utils.git = "https://codeberg.org/avitrano/utils"
+utils-log = { git = "https://codeberg.org/avitrano/utils", package = "log" }
+utils-sync = { git = "https://codeberg.org/avitrano/utils", package = "sync" }
+utils-channel = { git = "https://codeberg.org/avitrano/utils", package = "channel" }
+utils-io = { git = "https://codeberg.org/avitrano/utils", package = "io" }
+utils-bitset = { git = "https://codeberg.org/avitrano/utils", package = "bitset" }
 
 glam = { version = "0.33", features = ["bytemuck", "serde"] }
 postcard = { version = "1.1", default-features = false, features = ["use-std"] }

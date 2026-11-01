@@ -96,7 +96,7 @@ pub fn read_bvh(cs2: &CS2) -> Option<(Vec<Triangle>, Vec<SurfaceMaterial>)> {
 fn read_surface_materials(cs2: &CS2) -> Vec<SurfaceMaterial> {
     let controller = cs2.offsets.direct.surface_properties;
     if controller == 0 {
-        utils::debug!("empty surface properties");
+        utils_log::debug!("empty surface properties");
         return Vec::new();
     }
     let entries: UtlVector = cs2.process.read(controller + 0x20);
@@ -104,7 +104,7 @@ fn read_surface_materials(cs2: &CS2) -> Vec<SurfaceMaterial> {
         || entries.count == 0
         || entries.count as usize > MAX_SURFACE_MATERIALS
     {
-        utils::debug!("invalid surface properties vector");
+        utils_log::debug!("invalid surface properties vector");
         return Vec::new();
     }
     let entries: Vec<SurfaceMaterialEntry> = cs2.process.read_typed_vec(
@@ -127,7 +127,7 @@ fn read_surface_materials(cs2: &CS2) -> Vec<SurfaceMaterial> {
         })
         .collect();
 
-    utils::debug!("parsed {} surface properties", materials.len());
+    utils_log::debug!("parsed {} surface properties", materials.len());
     materials
 }
 

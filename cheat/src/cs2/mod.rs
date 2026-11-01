@@ -83,7 +83,7 @@ impl CS2 {
             self.is_valid = false;
             return;
         };
-        utils::info!("process found, pid: {}", process.pid);
+        utils_log::info!("process found, pid: {}", process.pid);
         self.process = process;
 
         self.offsets = match self.find_offsets() {
@@ -94,7 +94,7 @@ impl CS2 {
                 return;
             }
         };
-        utils::info!("offsets found");
+        utils_log::info!("offsets found");
 
         self.is_valid = true;
     }
@@ -102,7 +102,7 @@ impl CS2 {
     pub fn run(&mut self, config: &Config, mouse: &mut Mouse) {
         if !self.process.is_valid() {
             self.is_valid = false;
-            utils::debug!("process is no longer valid");
+            utils_log::debug!("process is no longer valid");
             return;
         }
 
@@ -472,9 +472,9 @@ impl CS2 {
 
             if self.bvh.is_some() {
                 if loaded_from_cache {
-                    utils::info!("loaded cached bvh for {current_map}");
+                    utils_log::info!("loaded cached bvh for {current_map}");
                 } else {
-                    utils::info!("built bvh for {current_map}");
+                    utils_log::info!("built bvh for {current_map}");
                 }
                 self.current_bvh = current_map;
             }

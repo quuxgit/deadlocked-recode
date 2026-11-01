@@ -9,7 +9,7 @@ macro_rules! field_stmt {
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, interface ($lib:ident, $name:literal)) => {{
         let Some($fdef) = $proc.get_interface_offset($off.library.$lib, $name) else {
-            utils::warn!(concat!(
+            utils_log::warn!(concat!(
                 "could not find '",
                 stringify!($fdef),
                 "' interface offset"
@@ -20,7 +20,7 @@ macro_rules! field_stmt {
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, convar ($name:literal)) => {{
         let Some($fdef) = $proc.get_convar($off.interface.cvar, $name) else {
-            utils::warn!(concat!(
+            utils_log::warn!(concat!(
                 "could not find '",
                 stringify!($fdef),
                 "' convar offset"
@@ -31,21 +31,21 @@ macro_rules! field_stmt {
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, scan ($sig:literal, $lib:ident, rel($a:literal, $b:literal))) => {{
         let Some($fdef) = $proc.scan($sig, $off.library.$lib) else {
-            utils::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
+            utils_log::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
             return None;
         };
         $off.$field.$fdef = $proc.get_relative_address($fdef, $a, $b);
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, scan ($sig:literal, $lib:ident, rel($a:literal, $b:literal, $c:literal))) => {{
         let Some($fdef) = $proc.scan($sig, $off.library.$lib) else {
-            utils::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
+            utils_log::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
             return None;
         };
         $off.$field.$fdef = $proc.get_relative_address($fdef + $a, $b, $c);
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, scan_ptr ($sig:literal, $lib:ident, rel($a:literal, $b:literal))) => {{
         let Some($fdef) = $proc.scan($sig, $off.library.$lib) else {
-            utils::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
+            utils_log::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
             return None;
         };
         let $fdef = $proc.get_relative_address($fdef, $a, $b);
@@ -79,7 +79,7 @@ macro_rules! field_stmt {
     }};
     ($proc:ident, $off:ident, $client:ident, $physics:ident, $field:ident, $fdef:ident, module_export ($lib:ident, $name:literal, rel($a:literal, $b:literal, $c:literal, $d:literal))) => {{
         let Some(window) = $proc.get_module_export($off.library.$lib, $name) else {
-            utils::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
+            utils_log::warn!(concat!("could not find '", stringify!($fdef), "' offset"));
             return None;
         };
         let window = $proc.get_relative_address(window, $a, $b);

@@ -5,7 +5,8 @@ edition = "2024"
 
 [dependencies]
 shared.workspace = true
-utils.workspace = true
+utils-log.workspace = true
+utils-sync.workspace = true
 
 postcard.workspace = true
 serde_json.workspace = true

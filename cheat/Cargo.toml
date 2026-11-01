@@ -5,7 +5,11 @@ edition = "2024"
 
 [dependencies]
 shared.workspace = true
-utils.workspace = true
+utils-log.workspace = true
+utils-sync.workspace = true
+utils-channel.workspace = true
+utils-io.workspace = true
+utils-bitset.workspace = true
 
 glam.workspace = true
 postcard.workspace = true

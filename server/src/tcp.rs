@@ -11,12 +11,12 @@ use uuid::Uuid;
 use crate::state::{ServerState, SessionState};
 
 pub async fn tcp_server(state: ServerState) {
-    utils::info!("starting tcp server on port 6346");
+    utils_log::info!("starting tcp server on port 6346");
 
     let listener = match TcpListener::bind("0.0.0.0:6346").await {
         Ok(listener) => listener,
         Err(err) => {
-            utils::error!("failed to bind port '0.0.0.0:6346': {}", err);
+            utils_log::error!("failed to bind port '0.0.0.0:6346': {}", err);
             return;
         }
     };
@@ -25,7 +25,7 @@ pub async fn tcp_server(state: ServerState) {
         let (stream, _addr) = match listener.accept().await {
             Ok(tcp) => tcp,
             Err(err) => {
-                utils::warn!("failed to accept connection: {err}");
+                utils_log::warn!("failed to accept connection: {err}");
                 continue;
             }
         };
@@ -44,50 +44,50 @@ async fn tcp_handler(mut stream: TcpStream, state: ServerState) {
     let proto_version = match timeout(INACTIVITY_TIMEOUT, stream.read_u32()).await {
         Ok(Ok(proto_version)) => proto_version,
         Ok(Err(err)) => {
-            utils::warn!("failed to receive protocol version: {err}");
+            utils_log::warn!("failed to receive protocol version: {err}");
             return;
         }
         Err(_) => {
-            utils::warn!("timed out waiting for protocol version");
+            utils_log::warn!("timed out waiting for protocol version");
             return;
         }
     };
 
     if proto_version != PROTO_VERSION {
-        utils::error!("protocol version is {PROTO_VERSION}, received {proto_version}");
+        utils_log::error!("protocol version is {PROTO_VERSION}, received {proto_version}");
         return;
     }
 
     let uuid_value = match timeout(INACTIVITY_TIMEOUT, stream.read_u128()).await {
         Ok(Ok(uuid_value)) => uuid_value,
         Ok(Err(err)) => {
-            utils::warn!("failed to receive session uuid: {err}");
+            utils_log::warn!("failed to receive session uuid: {err}");
             return;
         }
         Err(_) => {
-            utils::warn!("timed out waiting for session uuid");
+            utils_log::warn!("timed out waiting for session uuid");
             return;
         }
     };
 
     if let Err(err) = stream.write_u128(uuid_value).await {
-        utils::warn!("failed to send handshake: {err}");
+        utils_log::warn!("failed to send handshake: {err}");
         return;
     }
 
     let uuid = Uuid::from_u128(uuid_value);
     state.write().sessions.insert(uuid, SessionState::default());
-    utils::info!("connected to session {uuid}");
+    utils_log::info!("connected to session {uuid}");
 
     loop {
         let frame_length = match timeout(INACTIVITY_TIMEOUT, stream.read_u32()).await {
             Ok(Ok(frame_length)) => frame_length,
             Ok(Err(err)) => {
-                utils::debug!("session {uuid} disconnected while reading frame: {err}");
+                utils_log::debug!("session {uuid} disconnected while reading frame: {err}");
                 break;
             }
             Err(_) => {
-                utils::warn!("removed session {uuid} after inactivity timeout");
+                utils_log::warn!("removed session {uuid} after inactivity timeout");
                 break;
             }
         };
@@ -97,7 +97,7 @@ async fn tcp_handler(mut stream: TcpStream, state: ServerState) {
         }
 
         if frame_length > MAX_FRAME_SIZE {
-            utils::error!(
+            utils_log::error!(
                 "received oversized data frame from session {uuid}: {frame_length} bytes"
             );
             break;
@@ -107,11 +107,11 @@ async fn tcp_handler(mut stream: TcpStream, state: ServerState) {
         match timeout(INACTIVITY_TIMEOUT, stream.read_exact(&mut buf)).await {
             Ok(Ok(_)) => {}
             Ok(Err(err)) => {
-                utils::warn!("failed to read data frame from session {uuid}: {err}");
+                utils_log::warn!("failed to read data frame from session {uuid}: {err}");
                 break;
             }
             Err(_) => {
-                utils::warn!("removed session {uuid} after incomplete frame timeout");
+                utils_log::warn!("removed session {uuid} after incomplete frame timeout");
                 break;
             }
         }
@@ -119,7 +119,7 @@ async fn tcp_handler(mut stream: TcpStream, state: ServerState) {
         let data: Data = match postcard::from_bytes(&buf) {
             Ok(data) => data,
             Err(err) => {
-                utils::error!("failed to deserialize data: {err}");
+                utils_log::error!("failed to deserialize data: {err}");
                 continue;
             }
         };
@@ -131,5 +131,5 @@ async fn tcp_handler(mut stream: TcpStream, state: ServerState) {
     }
 
     state.write().sessions.remove(&uuid);
-    utils::info!("removed session {uuid}");
+    utils_log::info!("removed session {uuid}");
 }

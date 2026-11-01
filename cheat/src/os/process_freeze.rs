@@ -20,10 +20,10 @@ impl ProcessFreeze {
         match kill(Pid::from_raw(pid), Signal::SIGSTOP) {
             Ok(_) => {
                 self.frozen = true;
-                utils::info!("CS2 process frozen (PID: {})", pid);
+                utils_log::info!("CS2 process frozen (PID: {})", pid);
             }
             Err(e) => {
-                utils::warn!("Failed to freeze CS2 process: {}", e);
+                utils_log::warn!("Failed to freeze CS2 process: {}", e);
             }
         }
     }
@@ -36,10 +36,10 @@ impl ProcessFreeze {
         match kill(Pid::from_raw(pid), Signal::SIGCONT) {
             Ok(_) => {
                 self.frozen = false;
-                utils::info!("CS2 process unfrozen (PID: {})", pid);
+                utils_log::info!("CS2 process unfrozen (PID: {})", pid);
             }
             Err(e) => {
-                utils::warn!("Failed to unfreeze CS2 process: {}", e);
+                utils_log::warn!("Failed to unfreeze CS2 process: {}", e);
             }
         }
     }
@@ -52,7 +52,7 @@ impl ProcessFreeze {
 impl Drop for ProcessFreeze {
     fn drop(&mut self) {
         if self.frozen {
-            utils::warn!("ProcessFreeze dropped while frozen - attempting to unfreeze");
+            utils_log::warn!("ProcessFreeze dropped while frozen - attempting to unfreeze");
         }
     }
 }

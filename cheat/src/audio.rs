@@ -11,7 +11,7 @@ pub struct Audio {
 impl Audio {
     pub fn new() -> Self {
         let mut sink = DeviceSinkBuilder::open_default_sink().unwrap_or_else(|error| {
-            utils::error!("failed to initialize audio output: {error}");
+            utils_log::error!("failed to initialize audio output: {error}");
             std::process::exit(1);
         });
         sink.log_on_drop(false);
@@ -20,7 +20,7 @@ impl Audio {
 
     pub fn play(&self, bytes: &[u8], volume: f32) {
         let Ok(source) = Decoder::try_from(Cursor::new(bytes.to_vec())) else {
-            utils::warn!("failed to decode hitmarker sound");
+            utils_log::warn!("failed to decode hitmarker sound");
             return;
         };
         self.sink

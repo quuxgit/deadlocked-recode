@@ -8,7 +8,7 @@ use std::{
 };
 
 use shared::Data;
-use utils::RwLock;
+use utils_sync::RwLock;
 use uuid::Uuid;
 
 pub type ServerState = Arc<RwLock<State>>;

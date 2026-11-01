@@ -1,0 +1,6 @@
+.idea
+.vscode
+.direnv
+
+/target
+/package

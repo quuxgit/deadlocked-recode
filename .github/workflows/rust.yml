@@ -34,14 +34,25 @@ jobs:
           target/release/deadlocked-reduced-models
           setup.sh
         if-no-files-found: error
+
+  release:
+    runs-on: ubuntu-22.04
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v4
+    - name: install alsa for rodio
+      run: sudo apt-get update && sudo apt-get install --yes libasound2-dev pkg-config
+    - name: Build release binaries
+      run: cargo build --release
     - name: Create Release
-      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
         files: |
           target/release/deadlocked
-          target/release/deadlocked-reduced-models
           setup.sh
-        fail_on_unmatched_files: false
+        fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
